@@ -1,0 +1,18 @@
+# TWRP partition flags for Multilaser M10 4G Pro (Unisoc SC9863A)
+
+/super          emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/super          flags=display="Super";backup=1;flashimg=1
+/boot           emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/boot           flags=display="Boot";backup=1;flashimg=1
+/recovery       emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/recovery       flags=display="Recovery";backup=1;flashimg=1
+/dtbo           emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/dtbo           flags=display="DTBO";backup=1;flashimg=1
+/vbmeta         emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/vbmeta         flags=display="VBMeta";backup=1;flashimg=1
+/vbmeta_system  emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/vbmeta_system  flags=display="VBMeta System";backup=1;flashimg=1
+/vbmeta_vendor  emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/vbmeta_vendor  flags=display="VBMeta Vendor";backup=1;flashimg=1
+/persist        emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/persist        flags=display="Persist";backup=1
+/metadata       ext4    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/metadata       flags=display="Metadata"
+/socko          ext4    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/socko          flags=display="Socko"
+/odmko          ext4    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/odmko          flags=display="Odmko"
+/misc           emmc    /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/misc           flags=display="Misc"
+
+# External storage
+/external_sd    vfat    /dev/block/mmcblk1p1                                                    /dev/block/mmcblk1 flags=display="MicroSD";storage;wipeingui;removable
+/usb-otg        vfat    /dev/block/sda1                                                         /dev/block/sda     flags=display="USB-OTG";storage;wipeingui;removable

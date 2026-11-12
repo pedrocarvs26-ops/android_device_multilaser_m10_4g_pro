@@ -103,3 +103,6 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # Inherit proprietary vendor makefile if available
 $(call inherit-product-if-exists, vendor/multilaser/m10_4g_pro/m10_4g_pro-vendor.mk)
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/recovery/root/system/etc/twrp.flags:recovery/root/system/etc/twrp.flags
