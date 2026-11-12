@@ -1,0 +1,195 @@
+diff --git a/Android.mk b/Android.mk
+index 0f454f2..aa183b9 100755
+--- a/Android.mk
++++ b/Android.mk
+@@ -77,8 +77,8 @@ LOCAL_SRC_FILES := \
+     twrpApex.cpp \
+     twrpRepacker.cpp
+ 
+-LOCAL_STATIC_LIBRARIES += libavb libtwrpinstall
+-LOCAL_SHARED_LIBRARIES += libfs_mgr libinit
++LOCAL_STATIC_LIBRARIES += libavb libtwrpinstall libinit libc++fs
++LOCAL_SHARED_LIBRARIES += libfs_mgr
+ LOCAL_C_INCLUDES += \
+     system/core/fs_mgr/libfs_avb/include/ \
+     system/core/fs_mgr/include_fstab/ \
+@@ -124,7 +124,7 @@ LOCAL_C_INCLUDES += \
+ 
+ LOCAL_STATIC_LIBRARIES += libguitwrp
+ LOCAL_SHARED_LIBRARIES += libz libc libcutils libstdc++ libtar libblkid libminuitwrp libminadbd libmtdutils libtwadbbu libbootloader_message
+-LOCAL_SHARED_LIBRARIES += libcrecovery libtwrpdigest libc++ libaosprecovery libinit libcrypto libbase libziparchive libselinux
++LOCAL_SHARED_LIBRARIES += libcrecovery libtwrpdigest libc++ libaosprecovery libcrypto libbase libziparchive libselinux
+ 
+ ifneq ($(wildcard system/core/libsparse/Android.mk),)
+ LOCAL_SHARED_LIBRARIES += libsparse
+@@ -394,7 +394,6 @@ TWRP_REQUIRED_MODULES += \
+     awk \
+     toybox \
+     toolbox \
+-    mkshrc_twrp \
+     plat_hwservice_contexts \
+     vendor_hwservice_contexts \
+     minadbd \
+@@ -509,8 +508,7 @@ endif
+ ifeq ($(TARGET_USERIMAGES_USE_F2FS), true)
+     TWRP_REQUIRED_MODULES += sload.f2fs \
+         libfs_mgr \
+-        fs_mgr \
+-        libinit
++        fs_mgr
+ endif
+ 
+ TWRP_REQUIRED_MODULES += file_contexts_text
+diff --git a/etc/init.rc b/etc/init.rc
+index 8542196..c4f0204 100644
+--- a/etc/init.rc
++++ b/etc/init.rc
+@@ -99,7 +99,7 @@ service ueventd /system/bin/ueventd
+     critical
+     seclabel u:r:ueventd:s0
+ 
+-service adbd /system/bin/adbd --root_seclabel=u:r:su:s0 --device_banner=recovery
++service adbd /system/bin/adbd --device_banner=recovery
+     disabled
+     socket adbd stream 660 system system
+     seclabel u:r:adbd:s0
+diff --git a/minadbd/minadbd_services.cpp b/minadbd/minadbd_services.cpp
+index 5fe3052..06ed65a 100755
+--- a/minadbd/minadbd_services.cpp
++++ b/minadbd/minadbd_services.cpp
+@@ -48,6 +48,8 @@
+ #include "services.h"
+ #include "sysdeps.h"
+ 
++using android::base::ConsumePrefix;
++
+ static int minadbd_socket = -1;
+ static bool rescue_mode = false;
+ static std::string sideload_mount_point = FUSE_SIDELOAD_HOST_MOUNTPOINT;
+diff --git a/prebuilt/Android.mk b/prebuilt/Android.mk
+index 28711e8..b6d12e2 100755
+--- a/prebuilt/Android.mk
++++ b/prebuilt/Android.mk
+@@ -469,7 +469,7 @@ ifeq ($(TW_INCLUDE_DUMLOCK), true)
+     include $(BUILD_PREBUILT)
+ endif
+ 
+-ifeq ($(TW_USE_TOOLBOX), true)
++ifeq ($(TW_INSTALL_MKSHRC_TWRP), true)
+    include $(CLEAR_VARS)
+    LOCAL_MODULE := mkshrc_twrp
+    LOCAL_MODULE_STEM := mkshrc
+diff --git a/twrp.cpp b/twrp.cpp
+index 5f743d4..cb83c32 100644
+--- a/twrp.cpp
++++ b/twrp.cpp
+@@ -124,8 +124,7 @@ static void process_recovery_mode(twrpAdbBuFifo* adb_bu_fifo, bool skip_decrypti
+ 	}
+ 	printf("=> Processing %s\n", fstab_filename.c_str());
+ 	if (!PartitionManager.Process_Fstab(fstab_filename, 1)) {
+-		LOGERR("Failing out of recovery due to problem with fstab.\n");
+-		return;
++		LOGERR("Error processing fstab, continuing anyway...\n");
+ 	}
+ 
+ // We are doing this here to allow super partition to be set up prior to overriding properties
+diff --git a/twrpApex.cpp b/twrpApex.cpp
+index 3df7b5d..31e2fb5 100755
+--- a/twrpApex.cpp
++++ b/twrpApex.cpp
+@@ -8,10 +8,15 @@ bool twrpApex::loadApexImages() {
+ 		LOGERR("Unable to open %s\n", APEX_DIR);
+ 		return false;
+ 	}
+-	for (const auto& entry : fs::directory_iterator(APEX_DIR)) {
+-	   if (entry.is_regular_file()) {
+-		   apexFiles.push_back(entry.path().string());
+-	   }
++	std::error_code ec;
++	for (const auto& entry : fs::directory_iterator(APEX_DIR, ec)) {
++		if (ec) {
++			LOGERR("Error iterating %s: %s\n", APEX_DIR, ec.message().c_str());
++			break;
++		}
++		if (entry.is_regular_file(ec)) {
++			apexFiles.push_back(entry.path().string());
++		}
+ 	}
+ 
+ 	if (apexFiles.size() == 0) {
+@@ -31,6 +36,8 @@ bool twrpApex::loadApexImages() {
+ 	size_t apexFileCount = 0;
+ 	for (auto&& apexFile : apexFiles) {
+ 		std::string fileToMount = unzipImage(apexFile);
++		if (fileToMount.empty())
++			continue;
+ 		loadApexImage(fileToMount, apexFileCount++);
+ 	}
+ 	return true;
+@@ -42,7 +49,7 @@ std::string twrpApex::unzipImage(std::string file) {
+ 	if (ret != 0) {
+ 		LOGERR("unable to open zip archive %s\n", file.c_str());
+ 		CloseArchive(handle);
+-		return nullptr;
++		return "";
+ 	}
+ 
+ 	ZipEntry entry;
+@@ -51,19 +58,24 @@ std::string twrpApex::unzipImage(std::string file) {
+ 	if (ret != 0) {
+ 		LOGERR("unable to find %s in zip\n", APEX_PAYLOAD);
+ 		CloseArchive(handle);
+-		return nullptr;
++		return "";
+ 	}
+ 
+ 	std::string baseFile = basename(file.c_str());
+ 	std::string path("/tmp/");
+ 	path = path + baseFile;
+ 	int fd = open(path.c_str(), O_WRONLY|O_CREAT|O_TRUNC, 0666);
++	if (fd < 0) {
++		LOGERR("unable to create temp file %s\n", path.c_str());
++		CloseArchive(handle);
++		return "";
++	}
+ 	ret = ExtractEntryToFile(handle, &entry, fd);
+ 	if (ret != 0) {
+ 		LOGERR("unable to extract %s\n", path.c_str());
+ 		close(fd);
+ 		CloseArchive(handle);
+-		return nullptr;
++		return "";
+ 	}
+ 
+ 	close(fd);
+@@ -73,11 +85,16 @@ std::string twrpApex::unzipImage(std::string file) {
+ 
+ bool twrpApex::createLoopBackDevices(size_t count) {
+ 	size_t existing_loop_device_count = 0;
+-
+-	for (const auto& entry : fs::directory_iterator(LOOP_BLOCK_DEVICE_DIR)) {
+-	   if (entry.is_block_file() && entry.path().string().find("loop") != std::string::npos) {
+-		   existing_loop_device_count++;
+-	   }
++	std::error_code ec;
++
++	if (access(LOOP_BLOCK_DEVICE_DIR, F_OK) == 0) {
++		for (const auto& entry : fs::directory_iterator(LOOP_BLOCK_DEVICE_DIR, ec)) {
++			if (ec)
++				break;
++			if (entry.is_block_file(ec) && entry.path().string().find("loop") != std::string::npos) {
++				existing_loop_device_count++;
++			}
++		}
+ 	}
+ 
+ 	if (existing_loop_device_count < count) {
+@@ -131,7 +148,7 @@ bool twrpApex::loadApexImage(std::string fileToMount, size_t loop_device_number)
+ 	std::string bind_mount(APEX_BASE);
+ 	bind_mount = bind_mount + basename(fileToMount.c_str());
+ 	int ret = mkdir(bind_mount.c_str(), 0666);
+-	if (ret != 0) {
++	if (ret != 0 && errno != EEXIST) {
+ 		LOGERR("Unable to create mount directory: %s\n", bind_mount.c_str());
+ 		return false;
+ 	}
