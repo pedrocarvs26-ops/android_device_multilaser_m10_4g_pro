@@ -41,7 +41,7 @@ index 0f454f2..aa183b9 100755
  
  TWRP_REQUIRED_MODULES += file_contexts_text
 diff --git a/etc/init.rc b/etc/init.rc
-index 8542196..44885cc 100644
+index 8542196..97a1bfa 100644
 --- a/etc/init.rc
 +++ b/etc/init.rc
 @@ -99,7 +99,7 @@ service ueventd /system/bin/ueventd
@@ -53,7 +53,20 @@ index 8542196..44885cc 100644
      disabled
      socket adbd stream 660 system system
      seclabel u:r:adbd:s0
-@@ -126,7 +126,7 @@ on fs && property:ro.debuggable=1
+@@ -111,9 +111,10 @@ on property:ro.debuggable=1
+     setprop service.adb.root 1
+ 
+ service fastbootd /system/bin/fastbootd
++    user root
++    group root system
+     disabled
+-    group system
+-    seclabel u:r:fastbootd:s0
++    seclabel u:r:recovery:s0
+ 
+ # Restart adbd so it can run as root
+ on property:service.adb.root=1
+@@ -126,7 +127,7 @@ on fs && property:ro.debuggable=1
  on fs && property:sys.usb.configfs=1
      mount configfs none /config
      mkdir /config/usb_gadget/g1 0770 shell shell
@@ -62,7 +75,7 @@ index 8542196..44885cc 100644
      mkdir /config/usb_gadget/g1/strings/0x409 0770
      write /config/usb_gadget/g1/strings/0x409/serialnumber ${ro.serialno}
      write /config/usb_gadget/g1/strings/0x409/manufacturer ${ro.product.manufacturer}
-@@ -191,21 +191,21 @@ on property:sys.usb.config=none && property:sys.usb.configfs=1
+@@ -191,21 +192,22 @@ on property:sys.usb.config=none && property:sys.usb.configfs=1
      setprop sys.usb.state ${sys.usb.config}
  
  on property:sys.usb.config=sideload && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
@@ -83,10 +96,37 @@ index 8542196..44885cc 100644
  
  on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
 -    write /config/usb_gadget/g1/idProduct 0x4EE0
++    write /config/usb_gadget/g1/idVendor 0x1782
 +    write /config/usb_gadget/g1/idProduct 0x4d00
      write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "fastboot"
      symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
      write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+diff --git a/gui/theme/common/portrait.xml b/gui/theme/common/portrait.xml
+index 78677cb..ad718af 100755
+--- a/gui/theme/common/portrait.xml
++++ b/gui/theme/common/portrait.xml
+@@ -3113,17 +3113,10 @@
+ 				<listitem name="{@fastboot_button=Fastboot}">
+ 					<condition var1="tw_fastboot_mode" var2="1"/>
+ 					<actions>
+-						<action function="set">tw_back=reboot</action>
+-						<action function="set">tw_action=reboot</action>
+-						<action function="set">tw_action_param=fastboot</action>
+-						<action function="set">tw_reboot_param=fastboot</action>
+-						<action function="set">tw_has_action2=0</action>
+-						<action function="set">tw_text1={@no_os1=No OS Installed! Are you}</action>
+-						<action function="set">tw_text2={@no_osrb=sure you wish to reboot?}</action>
+-						<action function="set">tw_action_text1={@rebooting=Rebooting...}</action>
+-						<action function="set">tw_complete_text1={@rebooting=Rebooting...}</action>
+-						<action function="set">tw_slider_text={@swipe_reboot=Swipe to Reboot}</action>
+-						<action function="page">rebootcheck</action>
++						<action function="enablefastboot"/>
++						<action function="set">tw_enable_fastboot=1</action>
++						<action function="set">tw_enable_adb=0</action>
++						<action function="page">fastboot</action>
+ 					</actions>
+ 				</listitem>
+ 
 diff --git a/minadbd/minadbd_services.cpp b/minadbd/minadbd_services.cpp
 index 5fe3052..06ed65a 100755
 --- a/minadbd/minadbd_services.cpp
@@ -113,6 +153,234 @@ index 28711e8..b6d12e2 100755
     include $(CLEAR_VARS)
     LOCAL_MODULE := mkshrc_twrp
     LOCAL_MODULE_STEM := mkshrc
+diff --git a/startupArgs.cpp b/startupArgs.cpp
+index 4fe6ec0..df1a995 100755
+--- a/startupArgs.cpp
++++ b/startupArgs.cpp
+@@ -38,9 +38,6 @@ void startupArgs::parse(int *argc, char ***argv) {
+ 		if (args[index] == FASTBOOT) {
+ 			fastboot_mode = true;
+ 			android::base::SetProperty("sys.usb.config", "none");
+-			android::base::SetProperty("sys.usb.configfs", "0");
+-			sleep(1);
+-			android::base::SetProperty("sys.usb.configfs", "1");
+ 			android::base::SetProperty("sys.usb.config", "fastboot");
+ 			DataManager::SetValue("tw_enable_adb", 0);
+ 			DataManager::SetValue("tw_enable_fastboot", 1);
+diff --git a/tests/Android.bp b/tests/Android.bp
+deleted file mode 100644
+index 09ef716..0000000
+--- a/tests/Android.bp
++++ /dev/null
+@@ -1,208 +0,0 @@
+-// Copyright (C) 2018 The Android Open Source Project
+-//
+-// Licensed under the Apache License, Version 2.0 (the "License");
+-// you may not use this file except in compliance with the License.
+-// You may obtain a copy of the License at
+-//
+-//      http://www.apache.org/licenses/LICENSE-2.0
+-//
+-// Unless required by applicable law or agreed to in writing, software
+-// distributed under the License is distributed on an "AS IS" BASIS,
+-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-// See the License for the specific language governing permissions and
+-// limitations under the License.
+-
+-cc_defaults {
+-    name: "recovery_test_defaults",
+-
+-    defaults: [
+-        "recovery_defaults",
+-    ],
+-
+-    include_dirs: [
+-        "bootable/recovery",
+-    ],
+-
+-    shared_libs: [
+-        "libbase",
+-        "libcrypto",
+-        "libcutils",
+-        "liblog",
+-        "libpng",
+-        "libprocessgroup",
+-        "libselinux",
+-        "libz",
+-        "libziparchive",
+-    ],
+-
+-    target: {
+-        android: {
+-            shared_libs: [
+-                "libutils",
+-            ],
+-        },
+-
+-        host: {
+-            static_libs: [
+-                "libutils",
+-            ],
+-        },
+-    },
+-}
+-
+-// libapplypatch, libapplypatch_modes, libimgdiff, libimgpatch
+-libapplypatch_static_libs = [
+-    "libapplypatch_modes",
+-    "libapplypatch",
+-    "libedify",
+-    "libimgdiff",
+-    "libimgpatch",
+-    "libotautil",
+-    "libbsdiff",
+-    "libbspatch",
+-    "libdivsufsort",
+-    "libdivsufsort64",
+-    "libutils",
+-    "libbase",
+-    "libbrotli",
+-    "libbz",
+-    "libcrypto",
+-    "libz",
+-    "libziparchive",
+-]
+-
+-// librecovery_defaults uses many shared libs that we want to avoid using in tests (e.g. we don't
+-// have 32-bit android.hardware.health@2.0.so or libbootloader_message.so on marlin).
+-librecovery_static_libs = [
+-    "librecovery",
+-    "librecovery_fastboot",
+-    "libinstall",
+-    "librecovery_ui",
+-    "libminui",
+-    "libotautil",
+-
+-    "libhealthhalutils",
+-    "libvintf_recovery",
+-    "libvintf",
+-
+-    "android.hardware.health@2.0",
+-    "android.hardware.health@1.0",
+-    "libbootloader_message",
+-    "libext4_utils",
+-    "libfs_mgr",
+-    "libfusesideload",
+-    "libhidl-gen-utils",
+-    "libhidlbase",
+-    "libhidltransport",
+-    "libhwbinder_noltopgo",
+-    "libbinderthreadstate",
+-    "liblp",
+-    "libvndksupport",
+-    "libtinyxml2",
+-]
+-
+-cc_test {
+-    name: "recovery_unit_test",
+-    isolated: true,
+-
+-    defaults: [
+-        "recovery_test_defaults",
+-    ],
+-
+-    test_suites: ["device-tests"],
+-
+-    srcs: [
+-        "unit/*.cpp",
+-    ],
+-
+-    static_libs: libapplypatch_static_libs + [
+-        "libinstall",
+-        "librecovery_ui",
+-        "libminui",
+-        "libotautil",
+-        "libupdater",
+-        "libgtest_prod",
+-    ],
+-
+-    data: ["testdata/*"],
+-}
+-
+-cc_test {
+-    name: "recovery_manual_test",
+-    isolated: true,
+-
+-    defaults: [
+-        "recovery_test_defaults",
+-    ],
+-
+-    test_suites: ["device-tests"],
+-
+-    srcs: [
+-        "manual/recovery_test.cpp",
+-    ],
+-}
+-
+-cc_test {
+-    name: "recovery_component_test",
+-    isolated: true,
+-
+-    defaults: [
+-        "recovery_test_defaults",
+-        "libupdater_defaults",
+-    ],
+-
+-    test_suites: ["device-tests"],
+-
+-    srcs: [
+-        "component/*.cpp",
+-    ],
+-
+-    static_libs: libapplypatch_static_libs + librecovery_static_libs + [
+-        "libupdater",
+-        "libupdate_verifier",
+-        "libprotobuf-cpp-lite",
+-    ],
+-
+-    data: [
+-        "testdata/*",
+-        ":res-testdata",
+-    ],
+-}
+-
+-cc_test_host {
+-    name: "recovery_host_test",
+-    isolated: true,
+-
+-    defaults: [
+-        "recovery_test_defaults",
+-    ],
+-
+-    srcs: [
+-        "component/imgdiff_test.cpp",
+-    ],
+-
+-    static_libs: [
+-        "libimgdiff",
+-        "libimgpatch",
+-        "libotautil",
+-        "libbsdiff",
+-        "libbspatch",
+-        "libziparchive",
+-        "libutils",
+-        "libcrypto",
+-        "libbrotli",
+-        "libbz",
+-        "libdivsufsort64",
+-        "libdivsufsort",
+-        "libz",
+-    ],
+-
+-    data: ["testdata/*"],
+-
+-    target: {
+-        darwin: {
+-            // libimgdiff is not available on the Mac.
+-            enabled: false,
+-        },
+-    },
+-}
 diff --git a/twrp.cpp b/twrp.cpp
 index 5f743d4..e4a481a 100644
 --- a/twrp.cpp

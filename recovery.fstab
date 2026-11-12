@@ -19,4 +19,5 @@ product       /product        ext4    ro,barrier=1    wait,logical,first_stage_m
 /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/vbmeta_system  /vbmeta_system emmc  defaults                         defaults
 /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/vbmeta_vendor  /vbmeta_vendor emmc  defaults                         defaults
 /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/super          /super       emmc    defaults                         defaults
+/dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name/misc           /misc        emmc    defaults                         defaults
 /dev/block/platform/soc/soc:ap-ahb/20300000.sdio/mmcblk1p1              /external_sd vfat    defaults                         defaults

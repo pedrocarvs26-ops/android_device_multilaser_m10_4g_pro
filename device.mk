@@ -24,7 +24,8 @@ PRODUCT_ENFORCE_RRO_TARGETS := *
 
 # Fastbootd
 PRODUCT_PACKAGES += \
-    android.hardware.fastboot@1.1-impl-mock \
+    android.hardware.fastboot@1.0-impl-mock \
+    android.hardware.boot@1.0-impl.recovery \
     fastbootd
 
 # Health HAL
