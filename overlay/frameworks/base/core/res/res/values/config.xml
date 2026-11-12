@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 The LineageOS Project
+    SPDX-License-Identifier: Apache-2.0
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Display & Brightness Settings -->
+    <bool name="config_automatic_brightness_available">false</bool>
+    <integer name="config_autoBrightnessBrighteningLightDebounce">2000</integer>
+    <integer name="config_autoBrightnessDarkeningLightDebounce">4000</integer>
+    <integer name="config_brightness_ramp_rate_fast">600</integer>
+    <integer name="config_screenBrightnessSettingMinimum">6</integer>
+    <bool name="config_setColorTransformAccelerated">true</bool>
+
+    <!-- Navigation & Keys -->
+    <bool name="config_showNavigationBar">true</bool>
+    <integer name="config_overrideHasPermanentMenuKey">2</integer>
+
+    <!-- Power & Sensors -->
+    <bool name="config_enableAutoPowerModes">true</bool>
+    <bool name="config_suspendWhenScreenOffDueToProximity">true</bool>
+    <bool name="config_dozePulsePickup">true</bool>
+
+    <!-- Connectivity (Wi-Fi & Bluetooth) -->
+    <bool name="config_wifi_dual_band_support">true</bool>
+    <bool name="config_wifi_softap_acs_supported">true</bool>
+    <bool name="config_enableSoftApWPS">true</bool>
+    <bool name="config_wifi_framework_enable_associated_network_selection">false</bool>
+    <bool name="config_enableWifiDisplay">false</bool>
+    <integer name="config_bluetooth_max_connected_audio_devices">3</integer>
+
+    <!-- Audio & Voice -->
+    <bool name="config_useDevInputEventForAudioJack">true</bool>
+    <bool name="config_enableDtmfLocalTone">false</bool>
+
+    <!-- Telephony & IMS -->
+    <bool name="config_carrier_volte_available">true</bool>
+    <bool name="config_carrier_volte_provisioned">true</bool>
+    <bool name="config_carrier_volte_tty_supported">false</bool>
+    <bool name="config_carrier_vt_available">true</bool>
+    <bool name="config_device_volte_available">true</bool>
+    <bool name="config_device_vt_available">true</bool>
+    <bool name="config_device_wfc_ims_available">true</bool>
+    <bool name="config_dynamic_bind_ims">true</bool>
+    <bool name="skipHoldBeforeMerge">false</bool>
+    <bool name="skip_restoring_network_selection">true</bool>
+    <bool name="useImsAlwaysForEmergencyCall">false</bool>
+
+    <!-- Memory & Performance -->
+    <integer name="config_extraFreeKbytesAbsolute">24300</integer>
+    <integer name="config_extraFreeKbytesAdjust">0</integer>
+    <integer name="config_notificationsBatteryMediumARGB">0xFFFF0000</integer>
+</resources>
