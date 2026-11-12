@@ -91,9 +91,11 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/recovery.fstab:recovery/root/system/etc/recovery.fstab \
     $(LOCAL_PATH)/recovery/root/init.recovery.common.rc:recovery/root/init.recovery.common.rc \
     $(LOCAL_PATH)/recovery/root/init.recovery.s9863a1h10.rc:recovery/root/init.recovery.s9863a1h10.rc \
+    $(LOCAL_PATH)/recovery/root/init.recovery.sp9863a_1h10.rc:recovery/root/init.recovery.sp9863a_1h10.rc \
     $(LOCAL_PATH)/recovery/root/ueventd.s9863a1h10.rc:recovery/root/ueventd.s9863a1h10.rc \
     $(LOCAL_PATH)/recovery/root/init.recovery.common.rc:$(TARGET_COPY_OUT_RAMDISK)/init.recovery.common.rc \
-    $(LOCAL_PATH)/recovery/root/init.recovery.s9863a1h10.rc:$(TARGET_COPY_OUT_RAMDISK)/init.recovery.s9863a1h10.rc
+    $(LOCAL_PATH)/recovery/root/init.recovery.s9863a1h10.rc:$(TARGET_COPY_OUT_RAMDISK)/init.recovery.s9863a1h10.rc \
+    $(LOCAL_PATH)/recovery/root/init.recovery.sp9863a_1h10.rc:$(TARGET_COPY_OUT_RAMDISK)/init.recovery.sp9863a_1h10.rc
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \

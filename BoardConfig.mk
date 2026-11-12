@@ -85,6 +85,7 @@ BOARD_USES_UNISOC_HARDWARE := true
 TARGET_SYSTEM_PROP += $(DEVICE_PATH)/system.prop
 TARGET_VENDOR_PROP += $(DEVICE_PATH)/vendor.prop
 TARGET_PRODUCT_PROP += $(DEVICE_PATH)/product.prop
+TARGET_DEFAULT_PROPERTY_OVERRIDES += sys.usb.controller=musb-hdrc.0.auto sys.usb.configfs=1
 
 # Recovery / TWRP Configuration
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
