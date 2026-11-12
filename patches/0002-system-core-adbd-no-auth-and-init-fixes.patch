@@ -1,0 +1,43 @@
+diff --git a/adb/daemon/main.cpp b/adb/daemon/main.cpp
+index 8521b5f..b618c96 100644
+--- a/adb/daemon/main.cpp
++++ b/adb/daemon/main.cpp
+@@ -193,10 +193,10 @@ int adbd_main(int server_port) {
+     // If we're on userdebug/eng or the device is unlocked, permit no-authentication.
+     bool device_unlocked = "orange" == android::base::GetProperty("ro.boot.verifiedbootstate", "");
+     if (__android_log_is_debuggable() || device_unlocked) {
+-        auth_required = android::base::GetBoolProperty("ro.adb.secure", false);
+ #if defined(__ANDROID_RECOVERY__)
+-        auth_required = auth_required &&
+-                        android::base::GetBoolProperty("ro.adb.secure.recovery", true);
++        auth_required = false;
++#else
++        auth_required = android::base::GetBoolProperty("ro.adb.secure", false);
+ #endif
+     }
+ #endif
+diff --git a/init/Android.bp b/init/Android.bp
+index 377a374..7d1cf49 100644
+--- a/init/Android.bp
++++ b/init/Android.bp
+@@ -156,6 +156,7 @@ cc_library_static {
+     product_variables: {
+         lineage: {
+             target_init_vendor_lib: {
++                exclude_srcs: ["vendor_init.cpp"],
+                 whole_static_libs: ["%s"],
+             },
+         },
+diff --git a/rootdir/init.rc b/rootdir/init.rc
+index d5afabc..ee7fabd 100644
+--- a/rootdir/init.rc
++++ b/rootdir/init.rc
+@@ -134,7 +134,7 @@ on init
+ 
+     write /proc/sys/kernel/panic_on_oops 1
+     write /proc/sys/kernel/hung_task_timeout_secs 0
+-    write /proc/cpu/alignment 4
++    write /proc/cpu/alignment 2
+ 
+     # scheduler tunables
+     # Disable auto-scaling of scheduler tunables with hotplug. The tunables

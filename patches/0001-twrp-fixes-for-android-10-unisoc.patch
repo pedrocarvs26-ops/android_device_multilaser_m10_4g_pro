@@ -41,7 +41,7 @@ index 0f454f2..aa183b9 100755
  
  TWRP_REQUIRED_MODULES += file_contexts_text
 diff --git a/etc/init.rc b/etc/init.rc
-index 8542196..c4f0204 100644
+index 8542196..44885cc 100644
 --- a/etc/init.rc
 +++ b/etc/init.rc
 @@ -99,7 +99,7 @@ service ueventd /system/bin/ueventd
@@ -53,6 +53,40 @@ index 8542196..c4f0204 100644
      disabled
      socket adbd stream 660 system system
      seclabel u:r:adbd:s0
+@@ -126,7 +126,7 @@ on fs && property:ro.debuggable=1
+ on fs && property:sys.usb.configfs=1
+     mount configfs none /config
+     mkdir /config/usb_gadget/g1 0770 shell shell
+-    write /config/usb_gadget/g1/idVendor 0x18D1
++    write /config/usb_gadget/g1/idVendor 0x1782
+     mkdir /config/usb_gadget/g1/strings/0x409 0770
+     write /config/usb_gadget/g1/strings/0x409/serialnumber ${ro.serialno}
+     write /config/usb_gadget/g1/strings/0x409/manufacturer ${ro.product.manufacturer}
+@@ -191,21 +191,21 @@ on property:sys.usb.config=none && property:sys.usb.configfs=1
+     setprop sys.usb.state ${sys.usb.config}
+ 
+ on property:sys.usb.config=sideload && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
+-    write /config/usb_gadget/g1/idProduct 0xD001
++    write /config/usb_gadget/g1/idProduct 0x4d00
+     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
+     symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
+     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+     setprop sys.usb.state ${sys.usb.config}
+ 
+ on property:sys.usb.config=adb && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
+-    write /config/usb_gadget/g1/idProduct 0xD001
++    write /config/usb_gadget/g1/idProduct 0x4d00
+     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
+     symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
+     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+     setprop sys.usb.state ${sys.usb.config}
+ 
+ on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
+-    write /config/usb_gadget/g1/idProduct 0x4EE0
++    write /config/usb_gadget/g1/idProduct 0x4d00
+     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "fastboot"
+     symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
+     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
 diff --git a/minadbd/minadbd_services.cpp b/minadbd/minadbd_services.cpp
 index 5fe3052..06ed65a 100755
 --- a/minadbd/minadbd_services.cpp
@@ -80,7 +114,7 @@ index 28711e8..b6d12e2 100755
     LOCAL_MODULE := mkshrc_twrp
     LOCAL_MODULE_STEM := mkshrc
 diff --git a/twrp.cpp b/twrp.cpp
-index 5f743d4..cb83c32 100644
+index 5f743d4..e4a481a 100644
 --- a/twrp.cpp
 +++ b/twrp.cpp
 @@ -124,8 +124,7 @@ static void process_recovery_mode(twrpAdbBuFifo* adb_bu_fifo, bool skip_decrypti
@@ -93,6 +127,15 @@ index 5f743d4..cb83c32 100644
  	}
  
  // We are doing this here to allow super partition to be set up prior to overriding properties
+@@ -343,7 +342,7 @@ int main(int argc, char **argv) {
+ 	if (startup.Get_Fastboot_Mode()) {
+ 		LOGINFO("starting fastboot\n");
+ 		gui_msg(Msg("fastboot_console_msg=Entered Fastboot mode..."));
+-		if (gui_startPage("fastboot", 1, 1) != 0) {
++		if (gui_startPage("fastboot", 1, 0) != 0) {
+ 			LOGERR("Failed to start fastbootd page.\n");
+ 		}
+ 		delete adb_bu_fifo;
 diff --git a/twrpApex.cpp b/twrpApex.cpp
 index 3df7b5d..31e2fb5 100755
 --- a/twrpApex.cpp

@@ -4,16 +4,29 @@ import /init.recovery.common.rc
 on early-init
     setprop sys.usb.controller musb-hdrc.0.auto
     setprop sys.usb.configfs 1
+    insmod /vendor/lib/modules/gslX680.ko
+    insmod /system/lib/modules/gslX680.ko
+    write /sys/touchscreen/ts_suspend 0
 
 on init
+    insmod /vendor/lib/modules/gslX680.ko
+    insmod /system/lib/modules/gslX680.ko
+    write /sys/touchscreen/ts_suspend 0
     mkdir /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name 0775 root system
     symlink /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name /dev/block/by-name
     symlink /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name /dev/block/bootdevice/by-name
-    write /sys/touchscreen/ts_suspend 0
 
 on fs
+    insmod /vendor/lib/modules/gslX680.ko
+    insmod /system/lib/modules/gslX680.ko
+    write /sys/touchscreen/ts_suspend 0
     symlink /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name /dev/block/by-name
     symlink /dev/block/platform/soc/soc:ap-ahb/20600000.sdio/by-name /dev/block/bootdevice/by-name
+
+on boot
+    insmod /vendor/lib/modules/gslX680.ko
+    insmod /system/lib/modules/gslX680.ko
+    write /sys/touchscreen/ts_suspend 0
 
 on property:sys.usb.config=adb
     start adbd
@@ -31,35 +44,38 @@ on property:sys.usb.config=none && property:sys.usb.configfs=1
     setprop sys.usb.ffs.ready 0
     rm /config/usb_gadget/g1/configs/b.1/f1
     rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
     setprop sys.usb.state ${sys.usb.config}
 
 on property:sys.usb.config=adb && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
-    write /config/usb_gadget/g1/idVendor 0x18d1
-    write /config/usb_gadget/g1/idProduct 0x4ee7
+    write /config/usb_gadget/g1/idVendor 0x1782
+    write /config/usb_gadget/g1/idProduct 0x4d00
     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "adb"
     rm /config/usb_gadget/g1/configs/b.1/f1
     rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
     symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
 
 on property:sys.usb.config=mtp,adb && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
-    write /config/usb_gadget/g1/idVendor 0x18d1
-    write /config/usb_gadget/g1/idProduct 0x4ee2
+    write /config/usb_gadget/g1/idVendor 0x1782
+    write /config/usb_gadget/g1/idProduct 0x4d00
     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "mtp_adb"
     rm /config/usb_gadget/g1/configs/b.1/f1
     rm /config/usb_gadget/g1/configs/b.1/f2
-    symlink /config/usb_gadget/g1/functions/mtp.gs0 /config/usb_gadget/g1/configs/b.1/f1
-    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f1
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}
 
 on property:sys.usb.config=fastboot && property:sys.usb.ffs.ready=1 && property:sys.usb.configfs=1
-    write /config/usb_gadget/g1/idVendor 0x18d1
-    write /config/usb_gadget/g1/idProduct 0x4ee0
+    write /config/usb_gadget/g1/idVendor 0x1782
+    write /config/usb_gadget/g1/idProduct 0x4d00
     write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "fastboot"
     rm /config/usb_gadget/g1/configs/b.1/f1
     rm /config/usb_gadget/g1/configs/b.1/f2
+    rm /config/usb_gadget/g1/configs/b.1/f3
     symlink /config/usb_gadget/g1/functions/ffs.fastboot /config/usb_gadget/g1/configs/b.1/f1
     write /config/usb_gadget/g1/UDC ${sys.usb.controller}
     setprop sys.usb.state ${sys.usb.config}

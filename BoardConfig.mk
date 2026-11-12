@@ -93,7 +93,7 @@ BOARD_INCLUDE_RECOVERY_DTBO := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 
 # TWRP specific flags
-TW_THEME := landscape_hdpi
+TW_THEME := landscape_mdpi
 TW_SCREEN_WIDTH := 1280
 TW_SCREEN_HEIGHT := 800
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/sprd_backlight/brightness"

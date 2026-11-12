@@ -106,3 +106,22 @@ $(call inherit-product-if-exists, vendor/multilaser/m10_4g_pro/m10_4g_pro-vendor
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/recovery/root/system/etc/twrp.flags:recovery/root/system/etc/twrp.flags
+
+# Default properties for unauthenticated ADB & display density
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
+    ro.adb.secure=0 \
+    ro.adb.secure.recovery=0 \
+    ro.secure=0 \
+    ro.debuggable=1 \
+    persist.sys.usb.config=adb \
+    ro.sf.lcd_density=160
+
+# Recovery touch module, idc and rc files
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/recovery/root/vendor/lib/modules/gslX680.ko:recovery/root/vendor/lib/modules/gslX680.ko \
+    $(LOCAL_PATH)/recovery/root/vendor/lib/modules/gslX680.ko:recovery/root/system/lib/modules/gslX680.ko \
+    $(LOCAL_PATH)/recovery/root/vendor/usr/idc/gslx680_ts.idc:recovery/root/vendor/usr/idc/gslx680_ts.idc \
+    $(LOCAL_PATH)/recovery/root/system/usr/keylayout/gslX680_ts.kl:recovery/root/system/usr/keylayout/gslX680_ts.kl \
+    $(LOCAL_PATH)/recovery/root/init.recovery.sp9863a_1h10.rc:recovery/root/init.recovery.sp9863a_1h10.rc \
+    $(LOCAL_PATH)/recovery/root/init.recovery.SO0G_M10_4G_PRO.rc:recovery/root/init.recovery.SO0G_M10_4G_PRO.rc \
+    $(LOCAL_PATH)/recovery/root/init.recovery.m10_4g_pro.rc:recovery/root/init.recovery.m10_4g_pro.rc
