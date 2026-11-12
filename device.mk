@@ -88,8 +88,7 @@ PRODUCT_COPY_FILES += \
 
 # Recovery
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/recovery/root/etc/recovery.fstab:recovery/root/etc/recovery.fstab \
-    $(LOCAL_PATH)/recovery/root/system/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab
+    $(LOCAL_PATH)/recovery.fstab:recovery/root/system/etc/recovery.fstab
 
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
