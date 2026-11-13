@@ -1,0 +1,11 @@
+# Miscellaneous
+persist.netmon.linger=10000
+persist.storage.type=2
+ro.base_build=noah
+ro.carrier=oversea
+ro.com.google.acsa=true
+ro.com.google.gmsversion=10_202102
+ro.opa.eligible_device=true
+ro.setupwizard.rotation_locked=false
+sys.internal.emulated=1
+
