@@ -54,6 +54,19 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/rootdir/etc/fstab.s9863a1h10:$(TARGET_COPY_OUT_RAMDISK)/fstab.s9863a1h10
 
+# Original BSP keymaster, with its Android 10 dependencies in a private directory.
+# A13 keystore2 talks to the stable HIDL interface through km_compat.
+PRODUCT_PACKAGES += \
+    m10_keymaster_a10_service \
+    m10_keymaster_a10_keymaster4 \
+    m10_keymaster_a10_keymaster4support \
+    m10_keymaster_a10_messages \
+    m10_keymaster_a10_portable \
+    m10_keymaster_a10_puresoft \
+    m10_keymaster_a10_trusty \
+    m10_keymaster_a10_interface4 \
+    m10_keymaster_a10_interface3
+
 # Soong namespaces
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH)

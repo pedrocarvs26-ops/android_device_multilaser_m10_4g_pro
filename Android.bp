@@ -1,7 +1,88 @@
-//
-// SPDX-FileCopyrightText: The LineageOS Project
 // SPDX-License-Identifier: Apache-2.0
-//
 
-soong_namespace {
+soong_namespace {}
+
+// Keep the Android 10 BSP ABI private to its original keymaster process.
+// Never replace the A13/VNDK global libraries with old, same-SONAME blobs.
+cc_defaults {
+    name: "m10_keymaster_a10_defaults",
+    vendor: true,
+    compile_multilib: "64",
+    check_elf_files: false,
+    strip: { none: true },
+    stl: "none",
+    system_shared_libs: [],
+}
+
+cc_prebuilt_binary {
+    name: "m10_keymaster_a10_service",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/android.hardware.keymaster@4.0-unisoc.service"],
+    stem: "android.hardware.keymaster@4.0-unisoc.service",
+    relative_install_path: "hw",
+    init_rc: ["rootdir/etc/init.m10-keymaster-a10.rc"],
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_keymaster4",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/libkeymaster4.so"],
+    stem: "libkeymaster4",
+    relative_install_path: "m10-keymaster-a10",
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_keymaster4support",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/libkeymaster4support.so"],
+    stem: "libkeymaster4support",
+    relative_install_path: "m10-keymaster-a10",
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_messages",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/libkeymaster_messages.so"],
+    stem: "libkeymaster_messages",
+    relative_install_path: "m10-keymaster-a10",
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_portable",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/libkeymaster_portable.so"],
+    stem: "libkeymaster_portable",
+    relative_install_path: "m10-keymaster-a10",
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_puresoft",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/libpuresoftkeymasterdevice.so"],
+    stem: "libpuresoftkeymasterdevice",
+    relative_install_path: "m10-keymaster-a10",
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_trusty",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/libtrusty.so"],
+    stem: "libtrusty",
+    relative_install_path: "m10-keymaster-a10",
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_interface4",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/android.hardware.keymaster@4.0.so"],
+    stem: "android.hardware.keymaster@4.0",
+    relative_install_path: "m10-keymaster-a10",
+}
+
+cc_prebuilt_library_shared {
+    name: "m10_keymaster_a10_interface3",
+    defaults: ["m10_keymaster_a10_defaults"],
+    srcs: ["prebuilts/keymaster-a10/android.hardware.keymaster@3.0.so"],
+    stem: "android.hardware.keymaster@3.0",
+    relative_install_path: "m10-keymaster-a10",
 }

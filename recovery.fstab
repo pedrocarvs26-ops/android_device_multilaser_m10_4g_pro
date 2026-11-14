@@ -1,0 +1,10 @@
+# Recovery/OTA partition inventory; not the Android first-stage fstab.
+system /system ext4 ro wait,logical
+vendor /vendor ext4 ro wait,logical
+product /product ext4 ro wait,logical
+/dev/block/by-name/boot /boot emmc defaults defaults
+/dev/block/by-name/recovery /recovery emmc defaults defaults
+/dev/block/by-name/userdata /data f2fs noatime,nosuid,nodev wait,check
+/dev/block/by-name/cache /cache ext4 noatime,nosuid,nodev wait,check
+/dev/block/by-name/metadata /metadata ext4 noatime,nosuid,nodev wait,check
+/dev/block/by-name/misc /misc emmc defaults defaults

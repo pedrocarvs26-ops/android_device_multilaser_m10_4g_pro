@@ -51,6 +51,10 @@ endif
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
 BOARD_BOOTIMAGE_PARTITION_SIZE := 36700160
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 41943040
+# Non-A/B block OTAs require cache_size; measured on SO0G and matched to PAC.
+BOARD_CACHEIMAGE_PARTITION_SIZE := 3145728000
+BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_DTBOIMG_PARTITION_SIZE := 8388608
 BOARD_SUPER_PARTITION_SIZE := 4299161600
 BOARD_SUPER_PARTITION_GROUPS := multilaser_dynamic_partitions
@@ -90,11 +94,16 @@ TARGET_PRODUCT_PROP += $(DEVICE_PATH)/product.prop
 TARGET_ODM_PROP += $(DEVICE_PATH)/odm.prop
 
 # Recovery
-TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.s9863a1h10
+# OTA needs explicit /boot and /recovery entries; keep first-stage mounts separate.
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
 BOARD_INCLUDE_RECOVERY_DTBO := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
+
+# First-stage fstab mounts /metadata before SwitchRoot moves it to system root.
+# rootdir/Android.mk must create the corresponding directory in system.img.
+BOARD_USES_METADATA_PARTITION := true
 
 # Security patch level
 VENDOR_SECURITY_PATCH := 2022-11-05
@@ -102,6 +111,19 @@ VENDOR_SECURITY_PATCH := 2022-11-05
 # Verified Boot
 BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
+
+# Sign rebuilt boot/recovery with the device's existing Unisoc BSP keys.
+# Generated vbmeta/dtbo/recovery artifacts are NOT approved for installation.
+BOARD_AVB_BOOT_KEY_PATH := /mnt/m10_4g_pro/rsa4096_boot.pem
+BOARD_AVB_BOOT_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_BOOT_ROLLBACK_INDEX := 0
+BOARD_AVB_BOOT_ROLLBACK_INDEX_LOCATION := 1
+BOARD_AVB_BOOT_ADD_HASH_FOOTER_ARGS += --salt f15757f083fbfb775eed56237b42c48744636cc234db77dfe299549c32daa877
+BOARD_AVB_RECOVERY_KEY_PATH := /mnt/m10_4g_pro/rsa4096_recovery.pem
+BOARD_AVB_RECOVERY_ALGORITHM := SHA256_RSA4096
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 0
+BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 2
+BOARD_AVB_RECOVERY_ADD_HASH_FOOTER_ARGS += --salt 5dc95142823ac4b3f1f3e2662c7b01825c068580d3c860d7aec95efa95fdeb1f
 
 # VINTF
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/manifest.xml

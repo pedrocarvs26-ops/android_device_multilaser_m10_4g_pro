@@ -1,0 +1,50 @@
+{
+  "runpath": "/vendor/lib64/m10-keymaster-a10",
+  "files": {
+    "android.hardware.keymaster@4.0-unisoc.service": {
+      "original_sha256": "daf487eaf14741dacc6a1d8b711595068a6bbbf80970bdff065bc7876ac1a939",
+      "patched_sha256": "5e0cf67915988ca56175ffdf15be21a8ef16dfaf3ccdf2aef2078034264f23b7",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "libkeymaster4.so": {
+      "original_sha256": "663c27b0ea196309ff4364213e37aef52e1f35de3a7b999a5f453bcb7aa42697",
+      "patched_sha256": "3bf96c2697d594c87bed3d5adec262e4b006c7498b8253f1e39fced3a2b38962",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "libkeymaster4support.so": {
+      "original_sha256": "77f80b06516e6a0f6e99e9a0acfa9c4154468cbc107be0b796e129419477b995",
+      "patched_sha256": "2e1ccb6693366f63e54d4ba6defd25cf744ecb5c0c9d7dda47ce6ff35125a161",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "libkeymaster_messages.so": {
+      "original_sha256": "3d3c5e5931d189410df74da2dc4422f5ae8eb94e0500584c8b1e078499220dd6",
+      "patched_sha256": "4d85091664b722e857a439958eeb22055895739336c3df9a9b0e976e26ecfadc",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "libkeymaster_portable.so": {
+      "original_sha256": "3cbee3483e282a1db9f65a5242ddff86d880805be46cd0f4d94970826d2ba135",
+      "patched_sha256": "22d87ab2c614d9e118ac715255e0887a36d9db39d5c991138561fa0edb895c86",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "libpuresoftkeymasterdevice.so": {
+      "original_sha256": "dcd8faace806840f79bb2415afda54ecf4044491054252c349946bff3a18c229",
+      "patched_sha256": "3c566acb8de2455cdec01539597335c5438f3fc12029fb2abcaeb5fe51440836",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "libtrusty.so": {
+      "original_sha256": "7e552b0471e64e1008598e44a5b571ec86830130f2c55b43d6c70b39a6faa7c2",
+      "patched_sha256": "2eb193df7cc799e90ddf6cfef68cdd1213e90d70a92ee907d9b430db3339357f",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "android.hardware.keymaster@4.0.so": {
+      "original_sha256": "f162a53f3aa1303fde759060ec7a4bd2ec96d3878d812fa72b5bccbd43baf16a",
+      "patched_sha256": "48b0dce875ecbb3c67b52fdf54f26a429403d96a7552e6f319053c254a7aea8b",
+      "text_rodata_imports_exports_needed_preserved": true
+    },
+    "android.hardware.keymaster@3.0.so": {
+      "original_sha256": "54d4b4a154cd6fd63d9114b661771b5d834c486bdd85fd14a77d43f2cf9a0144",
+      "patched_sha256": "c4683264870d6cdce68515f1cfe9b7d0f0009538d87cfa892b9c04bc9b72d32f",
+      "text_rodata_imports_exports_needed_preserved": true
+    }
+  }
+}
